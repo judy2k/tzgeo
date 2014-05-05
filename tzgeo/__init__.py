@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 """
-Get the timezone from a latitude and longitude.
+Get the timezone for a location.
 
 In most cases, all you need to do is import `tzgeo` and call the
 `tz_lookup` function::
 
     >>> import tzgeo
-    >>> tzgeo.tzlookup(39.888724, -75.107952)
+    >>> tzgeo.tz_lookup(39.888724, -75.107952)
     u'America/New_York'
 
 `tzgeo` can also be used from the command-line::
