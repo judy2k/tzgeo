@@ -1,126 +1,72 @@
+# -*- coding: utf-8 -*-
+
+from __future__ import absolute_import, print_function
+
+try:
+    # simplejson is faster than json:
+    import simplejson as json
+except ImportError:
+    import json
+
 import os.path
 
-import pyspatialite.dbapi2 as db
+from . import db
 
 
+SOURCE_DATA_ROOT = os.path.join(
+    os.path.dirname(os.path.dirname(__file__)), 'whereonearth-timezone/data')
 DEFAULT_DBPATH = os.path.join(os.path.dirname(__file__), 'tzlookup.sqlite')
-
-DDL = """
-SELECT InitSpatialMetaData();
-CREATE TABLE timezone (
-    lc_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    tz_name TEXT NOT NULL);
-SELECT AddGeometryColumn(
-  'timezone', 'geometry', 4326, 'MULTIPOLYGON', 'XY', 1);
-SELECT CreateSpatialIndex('timezone', 'geometry');
-"""
-
-POINT_WITHIN_SQL = """
-    select tz_name
-        from timezone
-        where Within(
-            PointFromText(
-                'POINT({lon} {lat})',
-                4326
-            ),
-            geometry
-        );
-"""
-
-INSERT_TIMEZONE_SQL = """
-INSERT INTO timezone (tz_name, geometry) VALUES (
-  ?,
-  MultiPolygonFromText(?, 4326)
-);
-"""
-
-
-def _bjoin(l):
-    """
-    Convert the sequence `l` into a string by joining with ', ' and then
-    surrounding with parentheses.
-    """
-    return '(' + ', '.join(l) + ')'
-
-
-def multipolygon_to_wkt(mp):
-    """
-    Convert a GeoJSON-structured multypolygon dict to a WKT string.
-    """
-    if mp['type'] == 'MultiPolygon':
-        polys = []
-        for poly in mp['coordinates']:
-            poly_rings = []
-            for linear_ring in poly:
-                points = _bjoin('{0} {1}'.format(*point) for point in linear_ring)
-                poly_rings.append(points)
-            polys.append(_bjoin(poly_rings))
-        return 'MULTIPOLYGON ' + _bjoin(polys)
-    elif mp['type'] == 'Polygon':
-        poly_rings = []
-        for linear_ring in mp['coordinates']:
-            points = _bjoin('{0} {1}'.format(*point) for point in linear_ring)
-            poly_rings.append(points)
-        return 'MULTIPOLYGON (' + _bjoin(poly_rings) + ')'
 
 
 class TZGeo(object):
+    """
+    A callable object representing a connection to a tzlookup spatialite db.
+
+    This class defers connecting to the sqlite database until a call is made
+    that requires the connection because there is a default instance on the
+    module, called `tzlookup`. We want the class to do as little work as
+    possible on instantiation so that the module does as little work as
+    possible on import.
+    """
+
     def __init__(self, dbpath=DEFAULT_DBPATH):
-        self.dbpath = dbpath
-        self.connection = None
+        self._db = db.TimezoneLookupDB(dbpath)
 
     def __call__(self, lat, lon):
-        self._connect()
-        cur = self.connection.execute(POINT_WITHIN_SQL.format(lon=lon, lat=lat))
-        row = next(cur, None)
-        return row[0] if row else None
+        """
+        Lookup a timezone for the provided latitude and longitude.
 
-    def _connect(self):
-        if self.connection is None:
-            # TODO: Check for any error handling here!
-            self.connection = db.connect(self.dbpath)
-
-        if self.dbpath == ':memory:':
-            self._init_db()
-
-    def _init_db(self):
-        self._connect()
-        self.connection.executescript(DDL)
+        If no timezone region encompasses the provided point, this
+        returns `None`.
+        """
+        return self._db.timezone_for_point(lat, lon)
 
     @staticmethod
-    def _timezone_files():
-        data_root = os.path.join(os.path.dirname(os.path.dirname(__file__)),
-                                 'whereonearth-timezone/data')
-        for root, dirs, files in os.walk(data_root):
+    def _timezone_files(source_data_root):
+        for root, dirs, files in os.walk(source_data_root):
             for f in files:
                 if f.endswith('.geojson'):
                     path = os.path.join(root, f)
                     yield path
 
-    def load_timezone_data(self):
-        import geojson
-        self._connect()
-
+    def load_timezone_data(self, source_data_root=SOURCE_DATA_ROOT):
+        """
+        This is an internal method, used for updating the data contained in the
+        spatialite db.
+        """
         try:
-            self.connection.execute("DELETE FROM timezone")
-            for path in self._timezone_files():
+            self._db.init_db()
+            for path in self._timezone_files(source_data_root):
                 with open(path) as fp:
-                    data = geojson.load(
-                        fp, object_hook=geojson.GeoJSON.to_instance)
+                    data = json.load(fp)
                     feature = data['features'][0]
                     tz_name = feature['properties']['name']
-                    self.connection.execute(
-                        INSERT_TIMEZONE_SQL,
-                        (tz_name, multipolygon_to_wkt(feature['geometry']))
-                    )
-            self.connection.commit()
+                    self._db.insert_timezone_geometry(
+                        tz_name, feature['geometry'])
+            self._db.commit()
         except Exception:
-            self.connection.rollback()
+            self._db.rollback()
             raise
-
-    def __del__(self):
-        if self.connection is not None:
-            self.connection.close()
 
 
 tzlookup = TZGeo()

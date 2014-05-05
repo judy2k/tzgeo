@@ -20,8 +20,10 @@ def main(argv=sys.argv[1:]):
         print(result)
         exit(0)
     else:
-        print("No timezone could be found for lat {} and lon {}.",
-              file=sys.stderr)
+        print(
+            "No timezone could be found for lat {lat} and lon {lon}.".format(
+                lat=args.lat, lon=args.lon),
+            file=sys.stderr)
         exit(1)
 
 
