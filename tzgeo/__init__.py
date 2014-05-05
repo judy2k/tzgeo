@@ -34,8 +34,8 @@ from . import db
 
 
 __all__ = ['tz_lookup']
-__version__ = '0.0.1'
-__version_info__ = (0, 0, 1)
+__version__ = '0.0.2'
+__version_info__ = (0, 0, 2)
 
 
 SOURCE_DATA_ROOT = os.path.join(
