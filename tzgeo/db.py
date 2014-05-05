@@ -29,10 +29,18 @@ DDL = """
 """
 
 POINT_WITHIN_SQL = """
-    SELECT tz_name
-        FROM timezone
-        WHERE Within(PointFromText(?, 4326), geometry);
+SELECT tz.tz_name
+    FROM timezone AS tz
+    WHERE tz.ROWID IN
+    (
+        SELECT ROWID
+        FROM idx_timezone_geometry
+        WHERE xmin < ? AND xmax > ? AND ymin < ? AND ymax > ?
+        LIMIT 1
+    )
+    LIMIT 1;
 """
+
 
 INSERT_TIMEZONE_SQL = """
     INSERT INTO timezone (
@@ -102,8 +110,7 @@ class TimezoneLookupDB(object):
         If no timezone region is available for the location, it returns `None`.
         """
         self._connect()
-        cur = self._connection.execute(POINT_WITHIN_SQL,
-                                       (wkt_point(lon=lon, lat=lat),))
+        cur = self._connection.execute(POINT_WITHIN_SQL, (lon, lon, lat, lat))
         row = next(cur, None)
         return row[0] if row else None
 
