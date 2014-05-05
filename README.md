@@ -8,7 +8,7 @@ timezone - really fast!
 The easiest way to install is using `pip`
 
 ```shell
-pip install git+https://github.com/bedmondmark/tzgeo.git
+pip install tzgeo
 ```
 
 If you're lucky, this will install okay.
