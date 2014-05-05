@@ -1,6 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+"""
+tzgeo - Timezone lookup for a given location.
+"""
+
 from __future__ import absolute_import, print_function
 
 import argparse
@@ -10,12 +14,14 @@ import tzgeo
 
 
 def main(argv=sys.argv[1:]):
-    aparser = argparse.ArgumentParser()
+    aparser = argparse.ArgumentParser(
+        description=__doc__,
+        usage='python -m tzgeo [-h] lat lon')
     aparser.add_argument('lat')
     aparser.add_argument('lon')
 
     args = aparser.parse_args(argv)
-    result = tzgeo.tzlookup(args.lat, args.lon)
+    result = tzgeo.tz_lookup(args.lat, args.lon)
     if result is not None:
         print(result)
         exit(0)
