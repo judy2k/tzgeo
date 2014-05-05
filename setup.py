@@ -40,7 +40,7 @@ from setuptools import setup
 
 setup(
     name="tzgeo",
-    version="0.0.2",
+    version="0.0.3",
     description="Get the timezone for a location",
     long_description=__doc__,
     author='Mark Smith',
