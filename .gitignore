@@ -1,5 +1,11 @@
+*.egg-info
 *.pyc
 *.pyo
-*.sqlite
 .DS_Store
 .idea
+MANIFEST
+build
+dist
+setuptools-*
+tmp
+whereonearth-timezone

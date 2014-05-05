@@ -1,0 +1,2 @@
+include MANIFEST.in README.md LICENSE.txt
+include tzgeo/tzgeo.sqlite

@@ -34,12 +34,14 @@ from . import db
 
 
 __all__ = ['tz_lookup']
+__version__ = '0.0.1'
+__version_info__ = (0, 0, 1)
 
 
 SOURCE_DATA_ROOT = os.path.join(
     os.path.dirname(os.path.dirname(__file__)), 'whereonearth-timezone/data')
 
-DEFAULT_DBPATH = os.path.join(os.path.dirname(__file__), 'tzlookup.sqlite')
+DEFAULT_DBPATH = os.path.join(os.path.dirname(__file__), 'tzgeo.sqlite')
 
 
 tz_db = db.TimezoneLookupDB(DEFAULT_DBPATH)
