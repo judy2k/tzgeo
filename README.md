@@ -1,6 +1,6 @@
 # tzgeo
 
-tzgeo is a library with one simple purpose - to convert a lat/lon to a
+tzgeo is a Python library with one simple purpose - to convert a lat/lon to a
 timezone - really fast!
 
 ## Installation
@@ -36,6 +36,11 @@ u'America/New_York'
 
 If the lat/lon is invalid, or points at the ocean, `tz_lookup` will return
 `None`.
+
+```python
+>>> print(tzgeo.tz_lookup(0.0, 0.0))
+None
+```
 
 ## How Is This Done?
 
