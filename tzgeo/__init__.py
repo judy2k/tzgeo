@@ -10,6 +10,12 @@ In most cases, all you need to do is import `tzgeo` and call the
     >>> tzgeo.tz_lookup(39.888724, -75.107952)
     u'America/New_York'
 
+`tz_lookup` will return `None` if the location is not on land:
+
+    >>> import tzgeo
+    >>> print(tzgeo.tz_lookup(0.0, 0.0))
+    None
+
 `tzgeo` can also be used from the command-line::
 
     $ python -m tzgeo 39.888724 -75.107952
