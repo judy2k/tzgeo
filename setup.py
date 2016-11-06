@@ -33,7 +33,7 @@ More Information
 ----------------
 More information can be found on the project's `github page`_
 
-.. _`github page`: https://github.com/bedmondmark/tzgeo
+.. _`github page`: https://github.com/judy2k/tzgeo
 """
 
 from setuptools import setup
@@ -45,7 +45,7 @@ setup(
     long_description=__doc__,
     author='Mark Smith',
     author_email='mark.smith@practicalpoetry.co.uk',
-    url='https://github.com/bedmondmark/tzgeo',
+    url='https://github.com/judy2k/tzgeo',
     license='MIT License',
 
     packages=['tzgeo'],

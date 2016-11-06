@@ -62,13 +62,13 @@ concern, that may be a better option.
 ## You Did Something Wrong!
 
 If you have any problems installing or using the library, please create an
-[issue](https://github.com/bedmondmark/tzgeo/issues/new)
+[issue](https://github.com/judy2k/tzgeo/issues/new)
 describing the problem you're having, along with any information you think
 might be useful.
 
 I'm not a GIS expert, so I may have made a mistake. If you can suggest
 improvements, please
-[let me know](https://github.com/bedmondmark/tzgeo/issues/new). Even better,
+[let me know](https://github.com/judy2k/tzgeo/issues/new). Even better,
 submit a pull request with a fix!
 
 ## Todo
