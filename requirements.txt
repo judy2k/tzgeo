@@ -1,3 +1,5 @@
 pyspatialite>=3.0.1-alpha-0
+# Test and development requirements:
 pytest>=3.0.0,<4.0.0
 bumpversion>=0.5.3,<1.0
+wheel
