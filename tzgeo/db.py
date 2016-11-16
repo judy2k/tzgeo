@@ -36,9 +36,8 @@ SELECT tz.tz_name
         SELECT ROWID
         FROM idx_timezone_geometry
         WHERE xmin < ? AND xmax > ? AND ymin < ? AND ymax > ?
-        LIMIT 1
     )
-    LIMIT 1;
+    AND Contains(geometry, MAKEPOINT( ?, ?))
 """
 
 
@@ -109,8 +108,10 @@ class TimezoneLookupDB(object):
 
         If no timezone region is available for the location, it returns `None`.
         """
+        lat = float(lat)
+        lon = float(lon)
         self._connect()
-        cur = self._connection.execute(POINT_WITHIN_SQL, (lon, lon, lat, lat))
+        cur = self._connection.execute(POINT_WITHIN_SQL, (lon, lon, lat, lat, lon, lat))
         row = next(cur, None)
         return row[0] if row else None
 
