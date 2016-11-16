@@ -1,1 +1,2 @@
 pyspatialite>=3.0.1-alpha-0
+pytest>=3.0.0,<4.0.0
